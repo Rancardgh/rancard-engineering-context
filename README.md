@@ -13,7 +13,7 @@ This repository centralizes reusable knowledge and agent instructions.
 
 ## Skill Scope
 
-Copied skills:
+Skills Available:
 
 - `grill-with-docs`
 - `human-editor`
@@ -21,8 +21,3 @@ Copied skills:
 - `pdf`
 - `to-issues`
 - `zoom-out`
-
-Intentionally excluded:
-
-- `deploy-android-play-store`
-- `deploy-ios-testflight`
