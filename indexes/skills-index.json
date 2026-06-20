@@ -1,0 +1,32 @@
+[
+  {
+    "name": "grill-with-docs",
+    "path": "skills/grill-with-docs/SKILL.md",
+    "description": "Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise."
+  },
+  {
+    "name": "human-editor",
+    "path": "skills/human-editor/SKILL.md",
+    "description": "Rewrite rough, mechanical, stiff, AI-generated, or unclear text into natural, high-quality human writing while preserving the author's meaning, intent, facts, nuance, and voice."
+  },
+  {
+    "name": "improve-codebase-architecture",
+    "path": "skills/improve-codebase-architecture/SKILL.md",
+    "description": "Find deepening opportunities in a codebase, informed by the domain language in CONTEXT.md and the decisions in docs/adr/."
+  },
+  {
+    "name": "pdf",
+    "path": "skills/pdf/SKILL.md",
+    "description": "Use when tasks involve reading, creating, or reviewing PDF files where rendering and layout matter."
+  },
+  {
+    "name": "to-issues",
+    "path": "skills/to-issues/SKILL.md",
+    "description": "Break a plan, spec, or PRD into independently-grabbable issues on the project issue tracker using tracer-bullet vertical slices."
+  },
+  {
+    "name": "zoom-out",
+    "path": "skills/zoom-out/SKILL.md",
+    "description": "Tell the agent to zoom out and give broader context or a higher-level perspective."
+  }
+]
