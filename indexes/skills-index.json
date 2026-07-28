@@ -20,6 +20,11 @@
     "description": "Use when tasks involve reading, creating, or reviewing PDF files where rendering and layout matter."
   },
   {
+    "name": "solid-codebase-review",
+    "path": "skills/solid-codebase-review/SKILL.md",
+    "description": "Audit an entire codebase against SOLID principles, produce evidence-backed findings and an approval-gated remediation plan, then implement only approved changes."
+  },
+  {
     "name": "to-issues",
     "path": "skills/to-issues/SKILL.md",
     "description": "Break a plan, spec, or PRD into independently-grabbable issues on the project issue tracker using tracer-bullet vertical slices."

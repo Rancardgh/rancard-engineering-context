@@ -19,5 +19,6 @@ Skills Available:
 - `human-editor`
 - `improve-codebase-architecture`
 - `pdf`
+- `solid-codebase-review`
 - `to-issues`
 - `zoom-out`

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SOLID Codebase Review"
+  short_description: "Audit and improve code with SOLID guardrails"
+  default_prompt: "Use $solid-codebase-review to audit this codebase against SOLID principles and propose an approval-gated remediation plan."
