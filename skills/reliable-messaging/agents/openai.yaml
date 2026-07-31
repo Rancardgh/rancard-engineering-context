@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reliable Messaging"
+  short_description: "Reliable async handoffs across any stack"
+  default_prompt: "Use $reliable-messaging to make this asynchronous flow resilient to lost publication, duplicate delivery, retries, and terminal failure."

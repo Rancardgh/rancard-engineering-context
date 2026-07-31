@@ -1,0 +1,53 @@
+{
+  "skill_name": "reliable-messaging",
+  "evals": [
+    {
+      "id": 0,
+      "name": "dual-write-new-notification",
+      "prompt": "When an account becomes active, notify its primary contact asynchronously. Inspect this repository and wire the behavior end to end using its existing framework and conventions.",
+      "expected_output": "The implementation first discovers the repository's persistence and messaging mechanisms, then atomically records the required notification with the account activation, publishes it through a recoverable relay, and makes the consumer idempotent using the repository's established components and conventions.",
+      "files": [],
+      "assertions": [
+        "Inspects and reuses the repository's existing transaction and messaging abstractions",
+        "Records the domain change and durable messaging obligation atomically when the notification must eventually happen",
+        "Uses a stable domain-derived idempotency key rather than a new random value on each attempt",
+        "Provides a recovery path for a crash or outage between commit and publication",
+        "Makes duplicate consumer delivery safe",
+        "Adds focused tests for rollback, duplicate delivery, and retry or recovery behavior",
+        "Fits the repository's established components and conventions"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "inbound-callback-endpoint",
+      "prompt": "A payment provider will POST status callbacks containing a stable event_id and payment_reference. Add the callback flow using this codebase's existing web and persistence stack. Providers retry when responses time out.",
+      "expected_output": "The callback authenticates and validates the request, atomically deduplicates on the provider event ID with the durable effect, returns the protocol's success response for duplicates, and safely hands off any heavy asynchronous work.",
+      "files": [],
+      "assertions": [
+        "Uses the provider's stable event ID as the deduplication identity",
+        "Enforces deduplication with an atomic durable constraint or equivalent primitive",
+        "Commits the inbox receipt and durable business effect atomically when they share a store",
+        "Returns the expected success response for a valid duplicate callback",
+        "Makes any downstream asynchronous consumer independently idempotent",
+        "Adds tests for duplicate and concurrent callback delivery",
+        "Uses the target repository's language and established conventions"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "review-existing-flow",
+      "prompt": "Review the repository's order-fulfilment background flow for what can be lost, duplicated, stuck, or applied out of order if a process crashes or a dependency times out. Do not change code.",
+      "expected_output": "A read-only, evidence-backed review that traces the actual producer, transport, consumer, retries, and recovery mechanisms; identifies concrete failure windows; and proposes the smallest architecture-compatible fixes without assuming a specific framework.",
+      "files": [],
+      "assertions": [
+        "Leaves the working tree unchanged",
+        "Discovers actual delivery and acknowledgement semantics from repository evidence",
+        "Anchors findings to specific code locations",
+        "Names the concrete loss, duplicate, terminal-failure, or ordering window for each finding",
+        "Distinguishes must-deliver effects from intentionally best-effort work",
+        "Recommends existing repository mechanisms before proposing new infrastructure",
+        "Ranks findings by business impact and does not apply fixes"
+      ]
+    }
+  ]
+}
