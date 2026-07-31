@@ -20,6 +20,11 @@
     "description": "Use when tasks involve reading, creating, or reviewing PDF files where rendering and layout matter."
   },
   {
+    "name": "reliable-messaging",
+    "path": "skills/reliable-messaging/SKILL.md",
+    "description": "Route async side effects through the backend's transactional outbox, add consumer idempotency (inbox) guards, and attach dead-letter handling."
+  },
+  {
     "name": "solid-codebase-review",
     "path": "skills/solid-codebase-review/SKILL.md",
     "description": "Audit an entire codebase against SOLID principles, produce evidence-backed findings and an approval-gated remediation plan, then implement only approved changes."

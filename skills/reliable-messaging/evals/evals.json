@@ -1,0 +1,54 @@
+{
+  "skill_name": "reliable-messaging",
+  "evals": [
+    {
+      "id": 0,
+      "name": "dual-write-new-notification",
+      "prompt": "In BusinessOnboardingService.grant_access (backend/src/apps/core/services/business_onboarding_service.py) we need to notify the business contact once access is granted. Send them an email confirming the grant, with the organisation name and who granted it. Wire it up end to end.",
+      "expected_output": "Notification routed through the transactional outbox: a new OutboxEvent.EventType, emit() called inside the existing transaction.atomic() with a PK/token-derived idempotency_key, a handler module registered in HANDLER_REGISTRY, queue classification added, and a migration for the choices change. Should NOT be a bare guarded_apply_async/dispatcher call after the commit.",
+      "files": [],
+      "assertions": [
+        "Routes the notification through the transactional outbox rather than dispatching the email directly",
+        "Calls emit() inside the existing transaction.atomic() block, not after the commit",
+        "idempotency_key is derived from a stable domain fact (grant PK, token) rather than uuid4() or a timestamp",
+        "Adds a new OutboxEvent.EventType member for the notification",
+        "Adds a handler module under outbox/handlers/ and registers it in HANDLER_REGISTRY",
+        "Classifies the new event type into a queue set in outbox_tasks.py (critical/external) or deliberately leaves it default",
+        "Adds a Django migration for the EventType choices change",
+        "Handler imports its downstream task inside handle() rather than at module level"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "inbound-callback-endpoint",
+      "prompt": "The MNP provider is going to start POSTing porting status updates back to us instead of us polling. Add an endpoint at /api/v1/number-porting/callback/ that takes their payload (they send event_id, request_reference, status, timestamp) and moves our NumberPortingRequest to the right status. There's already apply_number_porting_status_update in number_porting_transition_service.py for the transition itself.",
+      "expected_output": "An inbox/dedup ledger keyed on the provider's event_id with a unique constraint, written in the same transaction as the effect; duplicate redeliveries return 2xx rather than an error; heavy work handed to a task that carries its own replay guard.",
+      "files": [],
+      "assertions": [
+        "Persists a deduplication record keyed on the provider's event_id (inbox ledger)",
+        "Deduplication is enforced by a database unique constraint, not only an .exists() check",
+        "The dedup write and the status transition happen inside the same transaction.atomic() block",
+        "A duplicate redelivery returns a 2xx response rather than 4xx/5xx",
+        "Any Celery task introduced uses base=DLQTask with bounded retries, or carries its own replay guard",
+        "Adds tests covering the duplicate-redelivery case"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "review-existing-flow",
+      "prompt": "I'm worried about what happens to number porting if a worker dies or we deploy mid-flight. Have a look at backend/src/apps/core/services/number_porting_service.py and the tasks it kicks off and tell me what we'd actually lose. Don't change anything yet.",
+      "expected_output": "A review that names concrete file:line hazards with the specific failure window (dual write, at-least-once redelivery of the provider call, missing DLQ), ranked by blast radius, with the outbox/idempotency/DLQ fixes proposed but NOT applied since the user said don't change anything.",
+      "files": [],
+      "assertions": [
+        "Respects the no-change instruction: working tree left clean",
+        "Anchors findings to specific file:line locations rather than describing hazards abstractly",
+        "Identifies the dual-write / commit-then-dispatch window as a loss scenario",
+        "Identifies at-least-once redelivery (task_acks_late) as a duplicate-effect hazard",
+        "Notes missing dead-letter visibility for exhausted retries where relevant",
+        "States a concrete failure scenario per finding rather than generic reliability advice",
+        "Ranks or prioritises findings by impact instead of listing them flat",
+        "Proposes the outbox/idempotency fixes and offers to implement, without applying them"
+      ]
+    }
+  ]
+}

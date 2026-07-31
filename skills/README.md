@@ -8,6 +8,7 @@ This directory contains copied installed skills, excluding the Flutter deploymen
 - `human-editor`
 - `improve-codebase-architecture`
 - `pdf`
+- `reliable-messaging`
 - `solid-codebase-review`
 - `to-issues`
 - `zoom-out`
