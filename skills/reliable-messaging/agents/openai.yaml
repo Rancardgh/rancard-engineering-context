@@ -1,4 +1,4 @@
 interface:
   display_name: "Reliable Messaging"
-  short_description: "Outbox, idempotent consumers, and DLQ for async side effects"
-  default_prompt: "Use $reliable-messaging to route this flow's async side effects through the transactional outbox, guard the consumer against redelivery, and attach dead-letter handling."
+  short_description: "Reliable async handoffs across any stack"
+  default_prompt: "Use $reliable-messaging to make this asynchronous flow resilient to lost publication, duplicate delivery, retries, and terminal failure."

@@ -1,227 +1,237 @@
 # Implementation recipes
 
 Contents:
-1. [New outbox event, end to end](#1-new-outbox-event-end-to-end)
-2. [Idempotency guards for task bodies](#2-idempotency-guards-for-task-bodies)
-3. [Inbox ledger for inbound callbacks](#3-inbox-ledger-for-inbound-callbacks)
-4. [DLQ wiring](#4-dlq-wiring)
-5. [Tests](#5-tests)
-6. [Review-finding template](#6-review-finding-template)
 
----
+1. [Repository discovery](#1-repository-discovery)
+2. [Transactional outbox](#2-transactional-outbox)
+3. [Relay and recovery](#3-relay-and-recovery)
+4. [Consumer idempotency](#4-consumer-idempotency)
+5. [Inbound callback inbox](#5-inbound-callback-inbox)
+6. [Retries and dead-letter handling](#6-retries-and-dead-letter-handling)
+7. [Ordering and concurrency](#7-ordering-and-concurrency)
+8. [Verification](#8-verification)
+9. [Review-finding template](#9-review-finding-template)
 
-## 1. New outbox event, end to end
+## 1. Repository discovery
 
-Five edits. Work through them in order — the registry raises `KeyError` (and the relay dead-letters the event) if you emit an event type with no handler, so never land the emit without the handler.
+Map the actual architecture before choosing an implementation. Search code, configuration, migrations, and operational documentation for:
 
-### 1.1 Event type
+- queue, broker, worker, consumer, subscriber, publisher, event, task, job, scheduler;
+- outbox, inbox, idempotency, deduplication, correlation, replay, reconciliation;
+- retry, backoff, timeout, dead letter, failed message, poison message;
+- transaction, unit of work, commit hook, row lock, lease, compare-and-set;
+- metrics, tracing, structured logs, alerts, dashboards, and admin replay tools.
 
-`backend/src/apps/core/models/outbox.py` — add to `OutboxEvent.EventType`. Values are dotted and namespaced by destination, which is what makes the queue classification in step 4 readable:
+Record the answers to these questions:
 
-```python
-BUSINESS_ACCESS_GRANTED = (
-    "notification.business_access_granted",
-    "Business Access Granted",
-)
-```
-
-Then `makemigrations core` — `EventType` is a `choices` list on a `CharField`, so Django generates an `AlterField`. It is not a schema change, but the migration must exist or CI's missing-migration check fails.
-
-### 1.2 Emit inside the domain transaction
-
-`emit()` raises `TransactionManagementError` unless a transaction is already open, on purpose: it will not let you write durable intent that isn't atomic with the state change that justified it. So the call goes *inside* the same `transaction.atomic()` block as the model writes.
-
-```python
-from src.apps.core.models.outbox import OutboxEvent
-from src.apps.core.outbox.emitter import emit
-
-with transaction.atomic():
-    grant = BusinessAccessGrant.objects.create(...)
-    emit(
-        event_type=OutboxEvent.EventType.BUSINESS_ACCESS_GRANTED,
-        idempotency_key=f"business_access_granted:{grant.pk}",
-        payload={"grant_id": grant.pk, "to_email": grant.contact_email},
-    )
-```
-
-**idempotency_key** is `UNIQUE`. Derive it from the domain fact that must happen at most once — a token, a PK, a provider reference (`user_invitation:{inv.token}`, `investigation_report:{report.pk}`). Never `uuid4()` or a timestamp: that defeats the constraint, which is the thing making a retried caller safe. If the caller legitimately re-emits (invitation token refresh), key it on the *new* token so the new send is a distinct fact.
-
-A duplicate key raises `IntegrityError` out of `emit`'s savepoint with the outer transaction still usable — catch it and return the "already exists" outcome, as `user_invitation_service.py:99` does.
-
-**payload** must be JSON-serializable and self-sufficient: the handler runs later, in another process, possibly after a deploy. Pass IDs plus whatever the handler cannot re-derive. Don't pass model instances, `Decimal`, `datetime` (use `.isoformat()`), or `UUID` (use `str()`). Keep secrets and raw PII out — the row is readable in Django admin and lands in `FailedTask` on dead-lettering.
-
-**From async code** (`adrf` views, async services): wrap the whole write-plus-emit in a sync function and `await sync_to_async(...)()` it — `admin_investigations_view.py:368` and `user_invitation_service.py:68` both do this. Never `sync_to_async(emit)` on its own; that opens a *different* transaction from the domain write and the atomicity you were buying is gone.
-
-### 1.3 Handler
-
-`backend/src/apps/core/outbox/handlers/<event_name>.py`, exporting `handle(payload: dict) -> None`. Handlers are thin: translate payload → the real dispatch. Keep heavy work in the downstream task so relay retries stay cheap.
-
-```python
-from src.shared.celery.backpressure import BackpressureRejected, guarded_apply_async
-from src.shared.celery.queues import QueueClass
-from src.shared.utils.logger import get_logger
-
-logger = get_logger(name=__name__)
-
-
-def handle(payload: dict) -> None:
-    from src.apps.core.tasks.notification_delivery_tasks import deliver_email
-
-    try:
-        guarded_apply_async(
-            deliver_email,
-            queue_class=QueueClass.CRITICAL,
-            critical=True,
-            source="outbox.business_access_granted",
-            args=(email_kwargs,),
-        )
-    except BackpressureRejected:
-        logger.info(
-            "Business access notification enqueue rejected by broker pressure",
-            caller="business_access_granted.handle",
-            source="outbox.business_access_granted",
-        )
-        raise
-```
-
-Two rules that are easy to get backwards:
-
-- **Import the downstream task inside `handle`.** The registry imports every handler module at startup; module-level task imports create cycles.
-- **Re-raise `BackpressureRejected` (and any other transient failure).** Raising is what tells the relay to retry with backoff and eventually dead-letter; swallowing it marks the event delivered when nothing was delivered. Compare `user_invitation.py` (critical, re-raises) with a fire-and-forget handler that logs and returns.
-
-Register in `backend/src/apps/core/outbox/registry.py` — add the module to the import list and the entry to `HANDLER_REGISTRY`.
-
-### 1.4 Queue classification
-
-`backend/src/apps/core/tasks/outbox_tasks.py` holds two sets that decide queue and backpressure treatment:
-
-- `_CRITICAL_OUTBOX_TYPES` → `QueueClass.CRITICAL`, `critical=True` (bypasses backpressure shedding). User-facing must-arrive messages: password reset, invitation, registration confirmation.
-- `_EXTERNAL_OUTBOX_TYPES` → `QueueClass.EXTERNAL`, isolating third-party latency from internal work. Telco/provider calls.
-- Neither → `QueueClass.DEFAULT`.
-
-Add the new type to the right set. Skipping this is silent — it just lands on the default queue.
-
-### 1.5 Verify the loop closes
-
-`sweep_pending_outbox_events` (beat, `src/celery.py`) re-enqueues PENDING events and resets `PROCESSING` locks older than 10 minutes. This is the recovery path when the `on_commit` publish fails or a worker dies mid-handler — it is why the pattern survives broker outages, and why an event stuck in PENDING is a handler bug, not a lost message.
-
----
-
-## 2. Idempotency guards for task bodies
-
-`task_acks_late=True` is global, so the broker redelivers the *original* message with the *same task ID* when a worker dies after executing and before acking. `self.retry()` allocates a new task ID — which is what makes a `request.id`-keyed guard distinguish a replay from a genuine retry.
-
-**Transient external send** (SMS, email, push) — Redis `SET NX`, mirroring `send_sms_task`:
-
-```python
-idempotency_key = f"sms:sent:{self.request.id}"
-redis = get_redis_client()
-if not redis.set(idempotency_key, 1, ex=_SMS_IDEMPOTENCY_TTL, nx=True):
-    logger.info("Skipping duplicate SMS task", caller="send_sms_task", task_id=self.request.id)
-    return True
-```
-
-TTL comfortably longer than the effect's window (SMS uses 1 hour, "well beyond OTP lifetime").
-
-**DB state transition** — status-gate under a row lock, mirroring `process_outbox_event`:
-
-```python
-with transaction.atomic():
-    obj = Model.objects.select_for_update(skip_locked=True).get(pk=pk)
-    if obj.status in TERMINAL_STATUSES:
-        logger.info("Already processed; skipping", pk=pk, status=obj.status)
-        return
-    obj.status = Model.Status.PROCESSING
-    obj.save(update_fields=["status", "updated_at"])
-```
-
-`skip_locked=True` means a concurrent worker returns instead of blocking. The read, the check, and the claiming write must be in one transaction — split them and two workers both pass the check.
-
-**Row creation** — unique constraint on the natural key plus `get_or_create`, or catch `IntegrityError`. Prefer letting the database arbitrate over an existence check in Python.
-
-**External API call with a provider-side effect** — send a client-supplied idempotency key or correlation ID if the provider supports one; otherwise gate on local state before calling and record the result immediately after.
-
----
-
-## 3. Inbox ledger for inbound callbacks
-
-External senders (telcos, partners, identity providers) retry on their own schedule and will replay a callback after a timeout even when you processed it. Dedupe on *their* identifier, in the same transaction as the effect, with a unique constraint — the constraint is the guard; a `.exists()` check alone races.
-
-```python
-with transaction.atomic():
-    try:
-        ProviderCallbackReceipt.objects.create(
-            provider="mtn",
-            provider_event_id=payload["event_id"],
-        )
-    except IntegrityError:
-        return Response({"status": "duplicate"}, status=200)
-
-    apply_the_effect(payload)
-```
-
-Return 2xx for duplicates: a 4xx/5xx makes the provider keep retrying a callback you already handled. Reserve non-2xx for genuinely unprocessable payloads. Handling *inside* the endpoint should stay minimal — persist the receipt, then hand off to a task (which needs its own guard from section 2).
-
----
-
-## 4. DLQ wiring
-
-```python
-from src.shared.celery.dlq_task import DLQTask
-from src.shared.celery.queues import QueueClass, queue_name
-
-@shared_task(
-    bind=True,
-    base=DLQTask,
-    max_retries=5,
-    queue=queue_name(QueueClass.DEFAULT),
-    retry_backoff=True,
-    retry_backoff_max=300,
-    retry_jitter=True,
-)
-def my_task(self, ...):
-    ...
-```
-
-`DLQTask.on_failure` fires only once retries are spent (`retries == max_retries`) and writes a `FailedTask` row with redacted args, exception type/message, traceback, retry count, and correlation ID. Without `max_retries` set, *every* failure dead-letters immediately.
-
-`retry_backoff` + `retry_jitter` matter under broker pressure: synchronized retries from many workers are how a degraded dependency turns into an outage.
-
-Publish with `guarded_apply_async(task, queue_class=..., source="...", critical=...)` rather than `.delay()`/`.apply_async()` — it applies backpressure policy and resolves the queue name. `critical=True` exempts must-arrive work from shedding. Callers must handle `BackpressureRejected`: re-raise inside outbox handlers (the relay retries), log and degrade where the effect is losable.
-
-**Anti-pattern:** `except Exception: logger.error(...)` with no re-raise inside a task. It converts a retryable failure into permanent silence — no retry, no `FailedTask`, no alert. Catch narrowly, or re-raise after logging.
-
----
-
-## 5. Tests
-
-Mirror the existing suites rather than inventing structure:
-
-| What | Mirror |
+| Question | Evidence to find |
 |---|---|
-| Emit inside/outside transaction, rollback discards event + callback, duplicate key | `backend/src/tests/core/outbox/test_emitter.py` |
-| Handler dispatches correctly, re-raises `BackpressureRejected` | `backend/src/tests/core/outbox/test_handlers.py` |
-| Relay: locking, status gating, retry, dead-letter, sweep | `backend/src/tests/core/tasks/test_outbox_tasks.py` |
-| Service emits the right event with the right idempotency key | `backend/src/tests/core/services/test_user_invitation_outbox.py` |
-| Backpressure interaction | `backend/src/tests/core/tasks/test_outbox_backpressure.py` |
+| What commits the source-of-truth state? | Database and transaction API |
+| What performs the handoff? | Queue client, event publisher, HTTP client, scheduler |
+| What are the delivery guarantees? | Broker configuration and consumer acknowledgement behavior |
+| How is a logical message identified? | Event ID, task ID, correlation ID, provider reference |
+| What prevents duplicate effects? | Unique constraint, conditional update, inbox, provider key |
+| What happens after final failure? | Dead-letter store or queue, alert, owner, replay command |
+| How is abandoned work recovered? | Poller, lease expiry, sweeper, reconciliation job |
 
-The tests worth writing for a new event, beyond happy path:
+Do not infer guarantees from library defaults alone. Verify repository configuration and the surrounding transaction flow.
 
-- **Rollback discards the event.** Raise inside the transaction after `emit`; assert no `OutboxEvent` row and no publish callback. This is the whole point of the pattern.
-- **Duplicate emit is safe.** Same idempotency key twice → `IntegrityError`, outer transaction still usable.
-- **Replay is a no-op.** Call the task twice with the same `request.id`; assert the effect happened once.
+## 2. Transactional outbox
 
-`emit` uses `transaction.on_commit`, which does not fire under pytest-django's default transaction wrapping — use `@pytest.mark.django_db(transaction=True)`, as every test in `test_emitter.py` does. Symptom of forgetting: the publish assertion fails while the event row exists.
+Use the repository's migration and persistence conventions. A minimal outbox record usually needs:
 
-Run: `docker compose exec srr_rest_api pytest src/tests/core/outbox/ src/tests/core/tasks/test_outbox_tasks.py`
+```text
+OutboxMessage
+  id                 stable unique identifier
+  event_type         versioned logical contract name
+  aggregate_key      optional ordering or partition key
+  idempotency_key    unique domain-derived key
+  payload            serialized, minimal, non-secret data
+  status             pending | processing | delivered | dead_letter
+  attempts           non-negative count
+  available_at       next eligible attempt
+  claimed_at         nullable lease timestamp
+  claimed_by         nullable worker identity
+  last_error         redacted summary
+  created_at
+  delivered_at
+```
 
----
+Write the domain state and message in one transaction:
 
-## 6. Review-finding template
+```text
+begin transaction
+  change domain state
+  insert outbox message(
+    idempotency_key = stable key derived from the domain fact,
+    event_type = versioned contract,
+    payload = identifiers and required immutable values
+  )
+commit transaction
+```
 
-When flagging rather than fixing, a finding earns its place by naming the window and the consequence. Keep it to four lines:
+Choose the key from the obligation itself, such as `invoice-issued:<invoice-id>:v2` or `welcome-email:<registration-id>`. A fresh random key on every retry defeats deduplication.
 
-> **`src/apps/core/services/business_onboarding_service.py:119`** — dual write. The `BusinessAccessGrant` commits, then the notification is dispatched outside the transaction; a deploy or worker crash in that gap loses the notification with no record that it was owed. The grant looks complete in the database while the customer never hears about it.
-> **Fix:** `emit(event_type=BUSINESS_ACCESS_GRANTED, idempotency_key=f"business_access_granted:{grant.pk}", ...)` inside the existing `transaction.atomic()`, plus a handler in `outbox/handlers/`. Want me to implement it?
+Keep the payload forward-compatible:
 
-Rank findings by blast radius: silent loss of a user-facing or money-adjacent effect first, duplicate side effects next, missing DLQ visibility last. Two well-argued findings beat eight generic ones — a reviewer who has to sift noise stops reading.
+- include a schema or event version;
+- serialize platform-neutral scalar values;
+- pass identifiers and immutable facts, not process-local objects;
+- define whether consumers re-read current state or act on the emitted snapshot;
+- minimize personal data and never store credentials or access tokens.
+
+If inserting a duplicate key is possible through caller retry, convert the unique-conflict outcome into the repository's established "already recorded" behavior without weakening the surrounding transaction.
+
+## 3. Relay and recovery
+
+The relay must tolerate multiple workers, crashes, and broker outages.
+
+```text
+repeat:
+  atomically claim eligible pending messages with a bounded lease
+  for each claimed message:
+    try:
+      publish using message.id as the stable message identity
+      mark delivered
+    catch transient failure:
+      increment attempts
+      schedule next attempt with exponential backoff and jitter
+    catch permanent failure or exhausted retries:
+      mark dead_letter and alert
+```
+
+Use the database's supported concurrency primitive: row locks with skip-locked semantics, an atomic status update, advisory locks, or a lease token. Ensure only the current lease owner can complete or release a claim.
+
+Recover claims whose lease expires. A crash after publish but before marking delivery can publish twice, so consumers must still be idempotent. An outbox provides at-least-once handoff, not magical exactly-once effects.
+
+An immediate post-commit publish can reduce latency, but a periodic relay or reconciliation path must remain authoritative.
+
+## 4. Consumer idempotency
+
+Choose the guard that matches the effect.
+
+### Durable database effect
+
+Store the receipt and effect atomically:
+
+```text
+begin transaction
+  insert inbox receipt(message_id) with unique constraint
+  if duplicate:
+    commit and acknowledge success
+  apply durable state change
+commit transaction
+acknowledge message
+```
+
+If processing fails, roll back both the receipt and effect so redelivery can retry.
+
+### State transition
+
+Use an atomic condition or lock:
+
+```text
+update entity
+set state = next_state, version = version + 1
+where id = entity_id
+  and state in allowed_predecessors
+  and version = expected_version
+```
+
+Treat zero updated rows as duplicate, stale, conflicting, or missing according to the domain contract.
+
+### Row creation
+
+Put a unique constraint on the natural business key and use an atomic create-or-return operation. A prior existence query is only an optimization and cannot be the correctness guard.
+
+### External provider effect
+
+Pass the logical message ID as the provider's idempotency or request key. Persist the provider reference and outcome. When the provider lacks idempotency support, distinguish these states explicitly:
+
+- not attempted;
+- attempt outcome known successful;
+- attempt outcome known failed;
+- outcome unknown because the connection failed after submission may have occurred.
+
+Do not blindly retry an unknown outcome when duplication is harmful. Reconcile with the provider or require a safe business decision.
+
+### Ephemeral duplicate suppression
+
+An expiring cache key or distributed lock is suitable only when the effect's duplicate window is bounded and losing the key is acceptable. Document the TTL basis and failure behavior.
+
+## 5. Inbound callback inbox
+
+Validate authentication and schema before deduplication. Use the sender's stable event ID, not a locally generated request ID.
+
+```text
+validate signature and payload
+begin transaction
+  insert callback receipt(provider, provider_event_id) with unique constraint
+  if duplicate:
+    commit and return the protocol's success response
+  apply the durable effect or write an outbox message for later work
+commit transaction
+return success
+```
+
+Return success for an already processed valid callback so the sender stops retrying. Return an error only when the protocol requires retry or the payload cannot be accepted.
+
+If heavy work is handed to a consumer, that consumer still needs its own idempotency guard because callback receipt deduplication and worker redelivery are separate boundaries.
+
+## 6. Retries and dead-letter handling
+
+Define an explicit policy per dependency or message type:
+
+- retryable error classes;
+- non-retryable error classes;
+- per-attempt timeout;
+- maximum attempts or elapsed retry window;
+- exponential backoff cap and jitter;
+- terminal storage location;
+- alert threshold and owner;
+- replay or reconciliation procedure.
+
+A durable dead-letter record should include message identity, contract type and version, redacted payload context, correlation identifiers, error classification, attempt history, timestamps, and current disposition. Restrict access and audit replay.
+
+Replay through the normal consumer path so idempotency and validation still apply. Do not edit failed payloads silently; preserve the original and record any corrected replacement.
+
+Avoid broad exception handlers that log and return success. They convert retryable failures into silent loss. Catch narrowly or rethrow after adding context.
+
+## 7. Ordering and concurrency
+
+Choose the smallest ordering scope required by the domain. Prefer per-aggregate ordering over global ordering.
+
+- Partition messages by aggregate key when the broker supports ordered partitions.
+- Include aggregate version or sequence in each message.
+- Reject or defer stale and future versions explicitly.
+- Make state machines monotonic where possible.
+- Use reconciliation when messages can arrive permanently out of order.
+
+Document what happens when version 12 arrives before version 11 and when version 11 arrives after version 12.
+
+## 8. Verification
+
+Use the repository's existing test stack. Cover the failure boundaries, not just the happy path:
+
+- rolling back the domain transaction leaves no outbox obligation;
+- committing state creates exactly one logical outbox obligation;
+- duplicate producer attempts resolve through the unique idempotency key;
+- a crash after publish and before acknowledgement causes safe redelivery;
+- two consumers racing produce one durable effect;
+- a stale lease is recovered;
+- transient failures retry with bounded backoff;
+- permanent or exhausted failures become observable dead letters;
+- replay is safe and audited;
+- duplicate callbacks return the expected success response;
+- stale or out-of-order messages cannot regress state;
+- sensitive values are absent from logs and failure records.
+
+Run focused tests first, then the repository's authoritative broader validation. Verify migrations, schemas, configuration, and operational documentation when they change.
+
+## 9. Review-finding template
+
+Keep each finding concrete:
+
+> **`path/to/producer:line` — dual-write loss window.** The domain record commits before the message is durably recorded. A process crash or broker outage in that gap leaves the record complete while the required side effect is never attempted and no recovery process can discover it. **Fix:** write a uniquely keyed outbox message in the same transaction and publish it through the existing relay or reconciliation mechanism.
+
+Include the consumer location when duplicate delivery or ordering is part of the risk. Rank findings by business impact: money or irreversible external effects, security and identity transitions, user-visible loss, duplicate notifications, then observability gaps.

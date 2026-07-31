@@ -22,7 +22,7 @@
   {
     "name": "reliable-messaging",
     "path": "skills/reliable-messaging/SKILL.md",
-    "description": "Route async side effects through the backend's transactional outbox, add consumer idempotency (inbox) guards, and attach dead-letter handling."
+    "description": "Design, implement, review, or diagnose reliable asynchronous messaging in any codebase using transactional outbox, idempotent consumer or inbox patterns, bounded retries, and dead-letter recovery."
   },
   {
     "name": "solid-codebase-review",
