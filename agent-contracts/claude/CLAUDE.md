@@ -1,4 +1,6 @@
-# Claude Code Instructions
+# Claude Code-Specific Instructions
+
+These instructions extend the canonical root instructions and are loaded by the root `CLAUDE.md` entrypoint.
 
 Use the project skills exposed through `../../.claude/skills/` when their descriptions match the requested work.
 

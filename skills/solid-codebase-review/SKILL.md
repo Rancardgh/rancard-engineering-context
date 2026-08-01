@@ -1,6 +1,6 @@
 ---
 name: solid-codebase-review
-description: Audit an entire codebase against SOLID principles, produce evidence-backed findings and an approval-gated remediation plan, then implement only approved changes. Use for explicit SOLID, architecture, maintainability, or code-quality reviews and whenever Codex is asked to write, add, change, fix, refactor, or implement code. Default to the entire application-owned codebase unless the user explicitly narrows the audit scope.
+description: Audit an entire codebase against SOLID principles, produce evidence-backed findings and an approval-gated remediation plan, then implement only approved changes. Use for explicit SOLID, architecture, maintainability, or code-quality reviews and whenever either Codex or Claude Code is asked to write, add, change, fix, refactor, or implement code. Default to the entire application-owned codebase unless the user explicitly narrows the audit scope.
 ---
 
 # SOLID Codebase Review
@@ -12,7 +12,7 @@ Apply SOLID pragmatically across the codebase before changing code. Separate the
 - Begin in read-only mode. Do not edit files, install dependencies, create branches, commit, or perform other mutations during the audit.
 - Audit the entire application-owned codebase unless the user explicitly limits the audit to named files, directories, modules, packages, or services. Do not infer a narrow audit scope merely because the requested implementation concerns one feature.
 - Inventory the repository before evaluating it. Do not substitute representative sampling, recent diffs, obvious hotspots, or selected modules for full coverage.
-- Read and follow repository instructions such as `AGENTS.md`, contribution guides, architecture documents, and test conventions.
+- Read and follow repository instructions such as `AGENTS.md`, `CLAUDE.md`, contribution guides, architecture documents, and test conventions.
 - Inspect the working tree and preserve unrelated or pre-existing changes.
 - Present findings and a remediation plan, then stop for explicit approval.
 - Treat approval as scoped to named finding IDs or phases. Implement nothing else without returning for approval.

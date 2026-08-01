@@ -1,10 +1,10 @@
-# Agent Instructions
+# Repository Agent Instructions
 
-Use this repository as the central source of reusable knowledge and agent instructions.
+This is the Codex entrypoint and the canonical source of repository instructions. Claude Code loads these same instructions through `CLAUDE.md`.
 
 ## Entry Points
 
-1. Read this file first.
+1. Use these shared instructions as the starting point in Codex or Claude Code.
 2. Use `README.md` to understand the repository layout.
 3. Use `indexes/skills-index.json` to find copied local skills.
 4. Use `policies/coding-standards.md` when coding standards are relevant.

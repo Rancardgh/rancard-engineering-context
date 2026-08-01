@@ -1,4 +1,6 @@
-# Codex Entrypoint
+# Codex Compatibility Entrypoint
+
+This compatibility entrypoint directs Codex consumers to the same canonical root instructions used by the repository's primary Codex entrypoint.
 
 Read `../../AGENTS.md` first.
 
