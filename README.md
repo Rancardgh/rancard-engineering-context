@@ -17,7 +17,7 @@ This repository centralizes reusable knowledge and agent instructions.
 
 ## Skill Scope
 
-Skills are grouped by their primary use.
+Skills Available:
 
 ### Technical documentation
 
