@@ -29,6 +29,7 @@ Skills Available:
 
 ### Code quality
 
+- `apply-domain-driven-design`
 - `improve-codebase-architecture`
 - `reliable-messaging`
 - `solid-codebase-review`
