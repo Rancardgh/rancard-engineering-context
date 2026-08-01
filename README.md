@@ -17,13 +17,22 @@ This repository centralizes reusable knowledge and agent instructions.
 
 ## Skill Scope
 
-Skills Available:
+Skills are grouped by their primary use.
+
+### Technical documentation
 
 - `grill-with-docs`
 - `human-editor`
-- `improve-codebase-architecture`
 - `pdf`
-- `reliable-messaging`
-- `solid-codebase-review`
 - `to-issues`
 - `zoom-out`
+
+### Code quality
+
+- `improve-codebase-architecture`
+- `reliable-messaging`
+- `solid-codebase-review`
+
+### Code security
+
+No code security skills are currently included.
