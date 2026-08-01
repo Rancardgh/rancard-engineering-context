@@ -1,6 +1,6 @@
-# Repository Agent Instructions
+# Rancard Engineering Context — Codex Guide
 
-This is the Codex entrypoint and the canonical source of repository instructions. Claude Code loads these same instructions through `CLAUDE.md`.
+This is the canonical repository guide. Claude Code loads the same instructions through `CLAUDE.md`.
 
 ## Entry Points
 

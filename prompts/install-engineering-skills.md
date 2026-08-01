@@ -14,7 +14,7 @@ Override these inputs when needed. `Skills` can be `all` or a comma-separated li
 
 1. This is a user-level installation. Do not add skill files or agent configuration to the repository currently being worked on.
 2. Obtain the source repository at the requested ref. Reuse a verified local checkout when one is available; otherwise, clone it into a temporary directory using existing Git credentials. Do not expose credentials or leave the temporary clone behind.
-3. Read the source repository's host entrypoint before installing anything: use `AGENTS.md` in Codex or `CLAUDE.md` in Claude Code. Both load the same canonical repository instructions. Then read `README.md` and `indexes/skills-index.json`.
+3. Read the source repository's host guide before installing anything: use `AGENTS.md` in Codex or `CLAUDE.md` in Claude Code. Both load the same canonical repository instructions. Then read `README.md` and `indexes/skills-index.json`.
 4. Resolve `Skills: all` exclusively from `indexes/skills-index.json`. Install only names present in that index; do not infer or include excluded skills.
 5. Resolve `Target agents: current` from the host that is executing this prompt:
    - Claude Code installs user skills under the current user's `~/.claude/skills/<skill-name>/` directory.

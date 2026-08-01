@@ -1,6 +1,6 @@
-# Codex Compatibility Entrypoint
+# Codex Guide Compatibility
 
-This compatibility entrypoint directs Codex consumers to the same canonical root instructions used by the repository's primary Codex entrypoint.
+This compatibility guide directs Codex consumers to the canonical root `AGENTS.md` guide.
 
 Read `../../AGENTS.md` first.
 

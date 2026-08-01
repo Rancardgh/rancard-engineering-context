@@ -4,8 +4,8 @@ This repository centralizes reusable knowledge and shared agent instructions for
 
 ## Contents
 
-- `AGENTS.md`: Codex entrypoint and canonical repository instructions shared by both agents.
-- `CLAUDE.md`: Claude Code entrypoint that imports the same canonical repository instructions.
+- `AGENTS.md`: Codex guide.
+- `CLAUDE.md`: Claude Code guide.
 - `.claude/`: Claude Code discovery configuration for canonical repository skills.
 - `agent-contracts/`: agent-specific compatibility and extension instructions for Codex and Claude Code.
 - `indexes/`: machine-readable catalogues of repository resources.
