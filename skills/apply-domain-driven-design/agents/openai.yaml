@@ -1,0 +1,7 @@
+interface:
+  display_name: "Apply Domain-Driven Design"
+  short_description: "Keep business code aligned with its domain"
+  default_prompt: "Use $apply-domain-driven-design to implement this business behavior with explicit domain language and invariants."
+
+policy:
+  allow_implicit_invocation: true
