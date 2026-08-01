@@ -43,8 +43,6 @@ Attribution: `grill-with-docs`, `improve-codebase-architecture`, `to-issues`, an
 
 ### Code security
 
-The following vendor-maintained plugins are options for verifying code security:
-
 | Platform | Plugin | What it does |
 | --- | --- | --- |
 | Codex | [Codex Security](https://learn.chatgpt.com/docs/security/plugin) | Scans authorized code for vulnerabilities and validates plausible findings before reporting them. |
