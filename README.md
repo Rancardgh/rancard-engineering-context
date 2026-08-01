@@ -6,14 +6,13 @@ This repository centralizes reusable knowledge and shared agent instructions for
 
 - `AGENTS.md`: Codex entrypoint and canonical repository instructions shared by both agents.
 - `CLAUDE.md`: Claude Code entrypoint that imports the same canonical repository instructions.
-- `.claude/skills/`: Claude Code discovery link to the canonical `skills/` directory.
-- `agent-contracts/claude/CLAUDE.md`: Claude Code-specific discovery guidance loaded after the shared instructions.
-- `agent-contracts/codex/AGENTS.md`: compatibility entrypoint that directs Codex consumers to the canonical root instructions.
-- `indexes/skills-index.json`: machine-readable index of copied local skills.
-- `policies/coding-standards.md`: coding standards already present in this repo.
-- `prompts/install-engineering-skills.md`: portable prompt for installing canonical skills globally for Claude Code, Codex, or both.
+- `.claude/`: Claude Code discovery configuration for canonical repository skills.
+- `agent-contracts/`: agent-specific compatibility and extension instructions for Codex and Claude Code.
+- `indexes/`: machine-readable catalogues of repository resources.
+- `policies/`: shared policies and standards for engineering work.
+- `prompts/`: portable prompts for cross-agent setup and reusable workflows.
 - `skills/`: canonical reusable skills available to Codex and Claude Code.
-- `templates/task-template.md`: task template already present in this repo.
+- `templates/`: reusable starting points for common engineering tasks and documents.
 
 ## Skill Scope
 
