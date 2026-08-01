@@ -15,6 +15,8 @@ Use this repository as the central source of reusable knowledge and agent instru
 
 Skills copied into `skills/` are canonical in this repository.
 
+Apply `skills/apply-domain-driven-design/SKILL.md` automatically when you write or refactor application code that implements business rules, workflows, policies, state transitions, or domain validation. Apply this skill even when the user does not mention DDD. Skip it for purely technical configuration, dependency, formatting, generated-code, or infrastructure-only changes.
+
 Apply `skills/write-asd-ste100/SKILL.md` automatically when you create, edit, or review an English technical document. This rule applies even when the user does not mention ASD-STE100. Follow `policies/asd-ste100.md` for scope, exceptions, and review status.
 
 Do not use the Flutter deployment skills from this repository. These skills are intentionally excluded.
