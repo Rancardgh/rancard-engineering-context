@@ -4,6 +4,7 @@ This directory contains copied installed skills, excluding the Flutter deploymen
 
 ## Included
 
+- `apply-domain-driven-design`
 - `grill-with-docs`
 - `human-editor`
 - `improve-codebase-architecture`

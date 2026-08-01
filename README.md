@@ -19,6 +19,7 @@ This repository centralizes reusable knowledge and agent instructions.
 
 Skills Available:
 
+- `apply-domain-driven-design`
 - `grill-with-docs`
 - `human-editor`
 - `improve-codebase-architecture`
