@@ -5,6 +5,9 @@ This repository centralizes reusable knowledge and agent instructions.
 ## Contents
 
 - `AGENTS.md`: repo-level instructions for coding agents.
+- `CLAUDE.md`: Claude Code entrypoint that imports the canonical repo instructions.
+- `.claude/skills/`: Claude Code discovery link to the canonical `skills/` directory.
+- `agent-contracts/claude/CLAUDE.md`: Claude-specific instructions.
 - `agent-contracts/codex/AGENTS.md`: Codex-specific entrypoint.
 - `indexes/skills-index.json`: machine-readable index of copied local skills.
 - `policies/coding-standards.md`: coding standards already present in this repo.
