@@ -12,4 +12,5 @@ This directory contains the canonical reusable skills available to Codex and Cla
 - `reliable-messaging`
 - `solid-codebase-review`
 - `to-issues`
+- `write-asd-ste100`
 - `zoom-out`
