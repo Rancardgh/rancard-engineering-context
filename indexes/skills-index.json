@@ -35,6 +35,11 @@
     "description": "Break a plan, spec, or PRD into independently-grabbable issues on the project issue tracker using tracer-bullet vertical slices."
   },
   {
+    "name": "write-asd-ste100",
+    "path": "skills/write-asd-ste100/SKILL.md",
+    "description": "Write, rewrite, and review English technical documents with ASD-STE100 Simplified Technical English, Issue 9. Use automatically for technical procedures, descriptions, requirements, specifications, architecture documents, ADRs, runbooks, reports, policies, guides, release notes, and document templates. Preserve exact source text, code, commands, identifiers, logs, legal text, and quoted material when fidelity is required."
+  },
+  {
     "name": "zoom-out",
     "path": "skills/zoom-out/SKILL.md",
     "description": "Tell the agent to zoom out and give broader context or a higher-level perspective."

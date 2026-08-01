@@ -11,6 +11,7 @@ This directory contains copied installed skills, excluding the Flutter deploymen
 - `reliable-messaging`
 - `solid-codebase-review`
 - `to-issues`
+- `write-asd-ste100`
 - `zoom-out`
 
 ## Excluded
