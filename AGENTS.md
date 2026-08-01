@@ -16,8 +16,6 @@ Skills copied into `skills/` are canonical in this repository.
 
 Apply `skills/apply-domain-driven-design/SKILL.md` automatically whenever writing or refactoring application code that implements business rules, workflows, policies, state transitions, or domain validation, even when the user does not mention DDD. Skip it for purely technical configuration, dependency, formatting, generated-code, or infrastructure-only changes.
 
-Do not use the Flutter deployment skills from this repository; they are intentionally excluded.
-
 ## Editing
 
 Keep changes grounded in files already present in this repository or in explicitly supplied new source material.
