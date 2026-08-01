@@ -43,7 +43,7 @@ Attribution: `grill-with-docs`, `improve-codebase-architecture`, `to-issues`, an
 
 ### Code security
 
-No code security skill is currently bundled in this repository. The following vendor-maintained plugins are available as options:
+The following vendor-maintained plugins are options for verifying code security:
 
 | Platform | Plugin | What it does |
 | --- | --- | --- |
