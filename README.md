@@ -11,6 +11,7 @@ This repository centralizes reusable knowledge and agent instructions.
 - `agent-contracts/codex/AGENTS.md`: Codex-specific entrypoint.
 - `indexes/skills-index.json`: machine-readable index of copied local skills.
 - `policies/coding-standards.md`: coding standards already present in this repo.
+- `prompts/install-engineering-skills.md`: portable prompt for installing canonical skills into a repository for Claude Code, Codex, or both.
 - `skills/`: copied installed skills, excluding Flutter deployment skills.
 - `templates/task-template.md`: task template already present in this repo.
 
