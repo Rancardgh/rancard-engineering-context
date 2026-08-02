@@ -26,6 +26,7 @@ Attribution: `grill-with-docs`, `improve-codebase-architecture`, `to-issues`, an
 
 | Skill | What it does | Learn more |
 | --- | --- | --- |
+| [`bootstrap-ai-project-context`](skills/bootstrap-ai-project-context/SKILL.md) | Turns technical documents into an agent guide, project specifications, and validated milestones. | [Software architecture documentation](https://arc42.org/overview) |
 | [`grill-with-docs`](skills/grill-with-docs/SKILL.md) | Challenges a plan, settles domain vocabulary, and records hard-to-reverse decisions. | [Domain-driven design](https://martinfowler.com/bliki/DomainDrivenDesign.html) and [architecture decision records](https://adr.github.io/) |
 | [`human-editor`](skills/human-editor/SKILL.md) | Improves clarity, flow, audience fit, and voice without changing the author's meaning. | [Self-editing technical writing](https://developers.google.com/tech-writing/two/editing) |
 | [`pdf`](skills/pdf/SKILL.md) | Reads, creates, and visually verifies PDFs so layout and rendering are preserved. | [About the Portable Document Format](https://www.adobe.com/acrobat/about-adobe-pdf.html) |

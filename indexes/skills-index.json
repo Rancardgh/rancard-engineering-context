@@ -5,6 +5,11 @@
     "description": "Apply pragmatic Domain-Driven Design while writing or refactoring application code. Use automatically whenever Codex or Claude Code implements business rules, workflows, policies, state transitions, domain validation, use cases, entities, value objects, aggregates, repositories, or domain events—even when the user does not mention DDD. Also use when changing code whose terminology or ownership spans business domains. Do not use for purely technical configuration, dependency bumps, formatting, generated code, or infrastructure with no business behavior."
   },
   {
+    "name": "bootstrap-ai-project-context",
+    "path": "skills/bootstrap-ai-project-context/SKILL.md",
+    "description": "Convert technical documentation and repository evidence into an agent-ready project context. Use when a user asks to assess one or more technical documents or folders, create or improve an AGENTS.md or CLAUDE.md guide, establish a specs/ directory, define project milestones, or create requirements, plan, and validation records. Start with read-only assessment unless the user explicitly authorizes generation or revision."
+  },
+  {
     "name": "grill-with-docs",
     "path": "skills/grill-with-docs/SKILL.md",
     "description": "Grilling session that challenges your plan against the existing domain model, sharpens terminology, and updates documentation (CONTEXT.md, ADRs) inline as decisions crystallise."

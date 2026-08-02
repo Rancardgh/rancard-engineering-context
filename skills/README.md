@@ -5,6 +5,7 @@ This directory contains the canonical reusable skills available to Codex and Cla
 ## Available
 
 - `apply-domain-driven-design`
+- `bootstrap-ai-project-context`
 - `grill-with-docs`
 - `human-editor`
 - `improve-codebase-architecture`
