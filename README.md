@@ -6,6 +6,7 @@ This repository centralizes reusable knowledge and shared agent instructions for
 
 - `AGENTS.md`: Codex guide.
 - `CLAUDE.md`: Claude Code guide.
+- `CONTRIBUTING.md`: contribution workflow and validation requirements.
 - `.claude/`: Claude Code discovery configuration for canonical repository skills.
 - `agent-contracts/`: agent-specific compatibility and extension instructions for Codex and Claude Code.
 - `docs/`: how-to guides for repository users.
