@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bootstrap AI Project Context"
+  short_description: "Turn technical documents into project context"
+  default_prompt: "Use $bootstrap-ai-project-context in assess mode to analyze these technical documents and propose an agent guide and specs directory without modifying files."

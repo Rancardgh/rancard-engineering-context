@@ -1,0 +1,50 @@
+{
+  "skill_name": "bootstrap-ai-project-context",
+  "evals": [
+    {
+      "id": 0,
+      "name": "assess-documentation-folder",
+      "prompt": "Use $bootstrap-ai-project-context in assess mode on ./docs and README.md. Inspect the repository for supporting context. Do not modify files.",
+      "expected_output": "A read-only evidence-backed assessment that inventories sources, separates facts from assumptions and conflicts, proposes an agent guide and specs structure, and identifies approval gates before generation.",
+      "files": [],
+      "assertions": [
+        "Does not modify the working tree",
+        "Treats explicitly named files as higher priority than discovered files",
+        "Reports source locations for material findings",
+        "Separates current implementation from target design",
+        "Proposes milestones with measurable exit criteria",
+        "Does not create a guide or specs directory before approval"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "bootstrap-for-invoking-agent",
+      "prompt": "Use $bootstrap-ai-project-context to bootstrap this repository from the approved assessment. The project is invoked from the current agent runtime. Create the required project guide and specs directory. Do not add support for another agent.",
+      "expected_output": "The implementation creates or revises only the invoking runtime's guide, creates evidence-supported agent-neutral specifications, and preserves the distinction between confirmed, planned, and unresolved work.",
+      "files": [],
+      "assertions": [
+        "Determines the invoking runtime from active context",
+        "Creates AGENTS.md for Codex or CLAUDE.md for Claude Code when absent",
+        "Does not create the other runtime's guide without explicit authorization",
+        "Keeps detailed project knowledge in specs",
+        "Does not invent commands, completion status, or technical claims",
+        "Validates cross-references and reports unresolved items"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "create-milestone-records",
+      "prompt": "Use $bootstrap-ai-project-context in plan-milestone mode to add the next approved milestone to this repository. The milestone requires a requirements record, implementation plan, and validation record.",
+      "expected_output": "The implementation creates a dated milestone directory with requirements.md, plan.md, and validation.md. It uses one measurable exit criterion, preserves external dependencies, and does not mark unrun validation as passed.",
+      "files": [],
+      "assertions": [
+        "Creates a dated milestone directory unless the repository has another established convention",
+        "Includes requirements, plan, and validation records",
+        "Uses one measurable exit criterion",
+        "Keeps future work outside the milestone out of scope",
+        "Records unrun checks as incomplete",
+        "Links the milestone to the roadmap and supporting evidence"
+      ]
+    }
+  ]
+}
