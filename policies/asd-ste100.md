@@ -14,6 +14,7 @@ The scope includes:
 
 - Procedures and runbooks
 - Requirements and specifications
+- Engineering Design Documents (EDDs)
 - Architecture documents and Architecture Decision Records (ADRs)
 - Technical reports and policies
 - API and integration guides
