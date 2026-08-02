@@ -30,6 +30,7 @@ Attribution: `grill-with-docs`, `improve-codebase-architecture`, `to-issues`, an
 | [`human-editor`](skills/human-editor/SKILL.md) | Improves clarity, flow, audience fit, and voice without changing the author's meaning. | [Self-editing technical writing](https://developers.google.com/tech-writing/two/editing) |
 | [`pdf`](skills/pdf/SKILL.md) | Reads, creates, and visually verifies PDFs so layout and rendering are preserved. | [About the Portable Document Format](https://www.adobe.com/acrobat/about-adobe-pdf.html) |
 | [`to-issues`](skills/to-issues/SKILL.md) | Turns a plan, specification, or product requirements document into independently deliverable tracer-bullet issues. | [Incremental and tracer-bullet development](https://resources.sei.cmu.edu/asset_files/TechnicalReport/2015_005_001_439065.pdf) |
+| [`write-asd-ste100`](skills/write-asd-ste100/SKILL.md) | Writes and reviews English technical documents with ASD-STE100 Simplified Technical English. | [ASD-STE100 Issue 9](https://www.asd-ste100.org/assets/files/ASD-STE100_ISSUE9.pdf) |
 | [`zoom-out`](skills/zoom-out/SKILL.md) | Moves up a level of abstraction to map the relevant modules and callers. | [C4 abstraction levels](https://c4model.com/abstractions) |
 
 ### Code quality
@@ -48,3 +49,9 @@ Attribution: `grill-with-docs`, `improve-codebase-architecture`, `to-issues`, an
 | Codex | [Codex Security](https://learn.chatgpt.com/docs/security/plugin) | Scans authorized code for vulnerabilities and validates plausible findings before reporting them. |
 | Claude Code | [Claude Security](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/claude-security) | Runs deep vulnerability scans, challenges findings, and can verify targeted patches before they are applied. |
 | Claude Code | [Security Guidance](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/security-guidance) | Adds continuous pattern warnings and reviews diffs and commits for common vulnerability classes. |
+
+## Documentation Standard
+
+Agents must apply `write-asd-ste100` to all English technical documents. The root `AGENTS.md` makes this skill automatic in this repository.
+
+Target repositories must copy the same instruction into their `AGENTS.md` file. Team members must install or copy the canonical skill folder into their agent's skill directory.

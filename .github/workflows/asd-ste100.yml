@@ -1,0 +1,20 @@
+name: ASD-STE100 structural checks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check-documents:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check changed text documents
+        run: >-
+          python3 skills/write-asd-ste100/scripts/check_ste.py
+          --changed-from "${{ github.event.pull_request.base.sha }}"

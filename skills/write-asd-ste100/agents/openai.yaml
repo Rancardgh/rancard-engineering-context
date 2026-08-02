@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write ASD-STE100"
+  short_description: "Write clear ASD-STE100 technical documents"
+  default_prompt: "Use $write-asd-ste100 to write or review this technical document in Simplified Technical English."
