@@ -1,8 +1,8 @@
 # Skills
 
-This directory contains copied installed skills, excluding the Flutter deployment skills.
+This directory contains the canonical reusable skills available to Codex and Claude Code.
 
-## Included
+## Available
 
 - `apply-domain-driven-design`
 - `grill-with-docs`
@@ -13,8 +13,3 @@ This directory contains copied installed skills, excluding the Flutter deploymen
 - `solid-codebase-review`
 - `to-issues`
 - `zoom-out`
-
-## Excluded
-
-- `deploy-android-play-store`
-- `deploy-ios-testflight`

@@ -1,4 +1,6 @@
-# Codex Entrypoint
+# Codex Guide Compatibility
+
+This compatibility guide directs Codex consumers to the canonical root `AGENTS.md` guide.
 
 Read `../../AGENTS.md` first.
 

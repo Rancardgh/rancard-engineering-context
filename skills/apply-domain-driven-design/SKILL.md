@@ -1,6 +1,6 @@
 ---
 name: apply-domain-driven-design
-description: Apply pragmatic Domain-Driven Design while writing or refactoring application code. Use automatically whenever Codex implements business rules, workflows, policies, state transitions, domain validation, use cases, entities, value objects, aggregates, repositories, or domain events—even when the user does not mention DDD. Also use when changing code whose terminology or ownership spans business domains. Do not use for purely technical configuration, dependency bumps, formatting, generated code, or infrastructure with no business behavior.
+description: Apply pragmatic Domain-Driven Design while writing or refactoring application code. Use automatically whenever Codex or Claude Code implements business rules, workflows, policies, state transitions, domain validation, use cases, entities, value objects, aggregates, repositories, or domain events—even when the user does not mention DDD. Also use when changing code whose terminology or ownership spans business domains. Do not use for purely technical configuration, dependency bumps, formatting, generated code, or infrastructure with no business behavior.
 ---
 
 # Apply Domain-Driven Design
