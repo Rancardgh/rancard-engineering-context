@@ -8,11 +8,18 @@ This repository centralizes reusable knowledge and shared agent instructions for
 - `CLAUDE.md`: Claude Code guide.
 - `.claude/`: Claude Code discovery configuration for canonical repository skills.
 - `agent-contracts/`: agent-specific compatibility and extension instructions for Codex and Claude Code.
+- `docs/`: how-to guides for repository users.
 - `indexes/`: machine-readable catalogues of repository resources.
 - `policies/`: shared policies and standards for engineering work.
 - `prompts/`: portable prompts for cross-agent setup and reusable workflows.
 - `skills/`: canonical reusable skills available to Codex and Claude Code.
 - `templates/`: reusable starting points for common engineering tasks and documents.
+
+## How to Use This Repo
+
+The repository includes agent instructions, reusable skills, policies, prompts, and templates.
+
+Read [How to Use This Repo](docs/how-to-use-this-repo.md) to learn how to find resources and install the skills.
 
 ## Skill Scope
 
