@@ -51,6 +51,14 @@ Attribution: `grill-with-docs`, `improve-codebase-architecture`, `to-issues`, an
 | [`reliable-messaging`](skills/reliable-messaging/SKILL.md) | Designs asynchronous flows for durable intent, safe retries, idempotency, and recovery. | [Transactional outbox pattern](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html) |
 | [`solid-codebase-review`](skills/solid-codebase-review/SKILL.md) | Audits a codebase against the five SOLID design principles before approved remediation. | [SOLID principles](https://en.wikipedia.org/wiki/SOLID) |
 
+### Data privacy
+
+| Skill | What it does | Learn more |
+| --- | --- | --- |
+| [`anonymize-sensitive-data`](skills/anonymize-sensitive-data/SKILL.md) | Automatically replaces sensitive personal and organizational data with placeholders and explains what changed. | [Protecting personally identifiable information](https://csrc.nist.gov/pubs/sp/800/122/final) |
+
+The skill minimizes disclosure in responses and subsequent tool inputs. It cannot remove sensitive data from an already-submitted prompt.
+
 ### Code security
 
 | Platform | Plugin | What it does |

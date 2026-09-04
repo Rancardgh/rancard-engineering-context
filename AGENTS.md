@@ -15,6 +15,10 @@ This is the canonical repository guide. Claude Code loads the same instructions 
 
 Skills copied into `skills/` are canonical in this repository.
 
+Apply `skills/anonymize-sensitive-data/SKILL.md` automatically when user-provided text contains personal data or potentially sensitive organizational information.
+
+This rule applies even when the user does not request anonymization. Follow the skill's privacy boundary and exact-value exceptions.
+
 Apply `skills/apply-domain-driven-design/SKILL.md` automatically when you write or refactor application code that implements business rules, workflows, policies, state transitions, or domain validation.
 
 Apply this skill even when the user does not mention DDD. Skip it for purely technical configuration, dependency, formatting, generated-code, or infrastructure-only changes.

@@ -4,6 +4,7 @@ This directory contains the canonical reusable skills available to Codex and Cla
 
 ## Available
 
+- `anonymize-sensitive-data`
 - `apply-domain-driven-design`
 - `bootstrap-ai-project-context`
 - `grill-with-docs`
