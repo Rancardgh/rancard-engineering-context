@@ -1,5 +1,10 @@
 [
   {
+    "name": "anonymize-sensitive-data",
+    "path": "skills/anonymize-sensitive-data/SKILL.md",
+    "description": "Automatically detect and anonymize PII and potentially sensitive names or identifiers in user-provided text before echoing, transforming, or passing them downstream. Use whenever a prompt includes personal, client, company, project, account, credential, health, financial, legal, HR, or other possibly non-public data; retain exact values only when essential to an authorized task."
+  },
+  {
     "name": "apply-domain-driven-design",
     "path": "skills/apply-domain-driven-design/SKILL.md",
     "description": "Apply pragmatic Domain-Driven Design while writing or refactoring application code. Use automatically whenever Codex or Claude Code implements business rules, workflows, policies, state transitions, domain validation, use cases, entities, value objects, aggregates, repositories, or domain events—even when the user does not mention DDD. Also use when changing code whose terminology or ownership spans business domains. Do not use for purely technical configuration, dependency bumps, formatting, generated code, or infrastructure with no business behavior."
