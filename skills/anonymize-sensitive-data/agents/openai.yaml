@@ -1,0 +1,6 @@
+interface:
+  display_name: "Anonymize Sensitive Data"
+  short_description: "Automatically redact sensitive prompt data"
+
+policy:
+  allow_implicit_invocation: true
